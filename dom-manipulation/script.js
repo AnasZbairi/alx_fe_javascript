@@ -14,8 +14,32 @@ async function fetchQuotesFromServer() {
     }
 }
 
+// Function to send quotes to the server
+async function sendQuotesToServer(quotes) {
+    try {
+        const response = await fetch('https://jsonplaceholder.typicode.com/posts', {
+            method: 'POST', // Use POST method
+            headers: {
+                'Content-Type': 'application/json', // Set the content type to JSON
+            },
+            body: JSON.stringify(quotes), // Convert the data to JSON format
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to send quotes to the server');
+        }
+
+        const result = await response.json();
+        console.log('Quotes sent successfully:', result);
+        return result;
+    } catch (error) {
+        console.error('Error sending quotes:', error);
+    }
+}
+
 // Function to sync quotes between local storage and server
 async function syncQuotes() {
+    // Fetch quotes from the server
     const serverQuotes = await fetchQuotesFromServer();
     if (serverQuotes) {
         // Get local quotes from localStorage
@@ -27,6 +51,9 @@ async function syncQuotes() {
         // Save merged quotes to localStorage
         localStorage.setItem('quotes', JSON.stringify(mergedQuotes));
         console.log('Quotes synced successfully:', mergedQuotes);
+
+        // Send the merged quotes back to the server
+        await sendQuotesToServer(mergedQuotes);
 
         // Notify the user
         alert('Quotes have been synced with the server.');

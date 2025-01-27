@@ -56,7 +56,8 @@ async function syncQuotes() {
         await sendQuotesToServer(mergedQuotes);
 
         // Notify the user
-        alert('Quotes have been synced with the server.');
+        alert('Quotes synced with server!'); // Add this line to meet the requirement
+        console.log('Quotes synced with server!'); // Add this line to meet the requirement
     }
 }
 

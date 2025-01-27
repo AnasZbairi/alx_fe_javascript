@@ -27,4 +27,17 @@ function addQuote() {
   }
 }
 
-document.addEventListener('DOMContentLoaded', showRandomQuote);
+function createAddQuoteForm() {
+  const formContainer = document.createElement('div');
+  formContainer.innerHTML = `
+    <input id="newQuoteText" type="text" placeholder="Enter a new quote" />
+    <input id="newQuoteCategory" type="text" placeholder="Enter quote category" />
+    <button onclick="addQuote()">Add Quote</button>
+  `;
+  document.body.appendChild(formContainer);
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  showRandomQuote(); // Display a random quote on page load
+  createAddQuoteForm(); // Create the form for adding new quotes
+});

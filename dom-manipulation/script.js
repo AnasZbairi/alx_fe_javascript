@@ -1,4 +1,4 @@
-// Step 1: Integrate Web Storage
+// Step 1: Integrate Web Storage and Filtering
 
 // Initialize the quotes array with some default quotes or load from localStorage
 let quotes = JSON.parse(localStorage.getItem('quotes')) || [
@@ -59,49 +59,55 @@ function addQuote() {
     document.getElementById('newQuoteText').value = '';
     document.getElementById('newQuoteCategory').value = '';
     saveQuotes(); // Save quotes to localStorage
-    showRandomQuote(); // Display the new quote immediately
+    populateCategories(); // Update the categories dropdown
+    filterQuotes(); // Refresh the displayed quotes
   } else {
     alert('Please fill in both the quote and category fields.');
   }
 }
 
-// Step 2: JSON Data Import and Export
+// Step 2: Implement Filtering Logic
 
-// Function to export quotes to a JSON file
-function exportToJsonFile() {
-  const dataStr = JSON.stringify(quotes, null, 2);
-  const blob = new Blob([dataStr], { type: 'application/json' });
-  const url = URL.createObjectURL(blob);
+// Function to populate the categories dropdown
+function populateCategories() {
+  const categoryFilter = document.getElementById('categoryFilter');
+  const categories = [...new Set(quotes.map(quote => quote.category))]; // Extract unique categories
+  categoryFilter.innerHTML = '<option value="all">All Categories</option>'; // Reset dropdown
 
-  const link = document.createElement('a');
-  link.href = url;
-  link.download = 'quotes.json';
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
-  URL.revokeObjectURL(url);
+  categories.forEach(category => {
+    const option = document.createElement('option');
+    option.value = category;
+    option.textContent = category;
+    categoryFilter.appendChild(option);
+  });
+
+  // Restore the last selected category from localStorage
+  const lastSelectedCategory = localStorage.getItem('lastSelectedCategory');
+  if (lastSelectedCategory) {
+    categoryFilter.value = lastSelectedCategory;
+  }
 }
 
-// Function to import quotes from a JSON file
-function importFromJsonFile(event) {
-  const fileReader = new FileReader();
-  fileReader.onload = function (event) {
-    const importedQuotes = JSON.parse(event.target.result);
-    quotes.push(...importedQuotes);
-    saveQuotes(); // Save updated quotes to localStorage
-    alert('Quotes imported successfully!');
-    showRandomQuote(); // Display a random quote after import
-  };
-  fileReader.readAsText(event.target.files[0]);
+// Function to filter quotes based on the selected category
+function filterQuotes() {
+  const selectedCategory = document.getElementById('categoryFilter').value;
+  const filteredQuotes = selectedCategory === 'all'
+    ? quotes
+    : quotes.filter(quote => quote.category === selectedCategory);
+
+  const quoteDisplay = document.getElementById('quoteDisplay');
+  quoteDisplay.innerHTML = filteredQuotes.map(quote => `
+    <p>"${quote.text}"</p><p><em>— ${quote.category}</em></p>
+  `).join('');
+
+  // Save the selected category to localStorage
+  localStorage.setItem('lastSelectedCategory', selectedCategory);
 }
 
-// Step 3: Add Event Listeners for Export and Import
+// Step 3: Add Event Listeners for Filtering
 
-// Add event listener for the "Export Quotes" button
-document.getElementById('exportQuotes').addEventListener('click', exportToJsonFile);
-
-// Add event listener for the file input to handle JSON import
-document.getElementById('importFile').addEventListener('change', importFromJsonFile);
+// Add event listener for the category filter dropdown
+document.getElementById('categoryFilter').addEventListener('change', filterQuotes);
 
 // Step 4: Initialize the Application
 
@@ -110,3 +116,9 @@ showRandomQuote();
 
 // Create the "Add Quote" form dynamically
 createAddQuoteForm();
+
+// Populate the categories dropdown when the page loads
+populateCategories();
+
+// Filter quotes based on the last selected category when the page loads
+filterQuotes();

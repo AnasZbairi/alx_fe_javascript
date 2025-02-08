@@ -95,35 +95,18 @@ function importFromJsonFile(event) {
   fileReader.readAsText(event.target.files[0]);
 }
 
-// Step 3: Add UI Elements for Import/Export
+// Step 3: Add Event Listeners for Export and Import
 
-// Function to create the export button
-function createExportButton() {
-  const exportButton = document.createElement('button');
-  exportButton.textContent = 'Export Quotes to JSON';
-  exportButton.onclick = exportToJsonFile;
-  document.body.appendChild(exportButton);
-}
+// Add event listener for the "Export Quotes" button
+document.getElementById('exportQuotes').addEventListener('click', exportToJsonFile);
 
-// Function to create the import file input
-function createImportFileInput() {
-  const fileInput = document.createElement('input');
-  fileInput.type = 'file';
-  fileInput.id = 'importFile';
-  fileInput.accept = '.json';
-  fileInput.onchange = importFromJsonFile;
-  document.body.appendChild(fileInput);
-}
+// Add event listener for the file input to handle JSON import
+document.getElementById('importFile').addEventListener('change', importFromJsonFile);
 
-// Event listener for the "Show New Quote" button
-document.getElementById('newQuote').addEventListener('click', showRandomQuote);
+// Step 4: Initialize the Application
 
 // Display a random quote when the page loads
 showRandomQuote();
 
 // Create the "Add Quote" form dynamically
 createAddQuoteForm();
-
-// Create the export button and import file input
-createExportButton();
-createImportFileInput();

@@ -1,6 +1,6 @@
 // Step 1: Simulate Server Interaction
 
-// Mock API URL for fetching quotes
+// Mock API URL for fetching and posting quotes
 const MOCK_API_URL = 'https://jsonplaceholder.typicode.com/posts';
 
 // Function to fetch quotes from the server
@@ -22,10 +22,33 @@ async function fetchQuotesFromServer() {
   }
 }
 
+// Function to send quotes to the server
+async function sendQuotesToServer(quotes) {
+  try {
+    const response = await fetch(MOCK_API_URL, {
+      method: 'POST', // Use POST to send data
+      headers: {
+        'Content-Type': 'application/json', // Set the content type to JSON
+      },
+      body: JSON.stringify(quotes), // Convert the quotes array to JSON
+    });
+    if (!response.ok) {
+      throw new Error('Failed to send quotes to the server');
+    }
+    const data = await response.json();
+    console.log('Quotes sent to the server:', data);
+    return data;
+  } catch (error) {
+    console.error('Error sending quotes to the server:', error);
+    return null;
+  }
+}
+
 // Step 2: Implement Data Syncing
 
 // Function to sync local quotes with server quotes
 async function syncQuotes() {
+  // Fetch quotes from the server
   const serverQuotes = await fetchQuotesFromServer();
   const localQuotes = JSON.parse(localStorage.getItem('quotes')) || [];
 
@@ -41,6 +64,9 @@ async function syncQuotes() {
   // Save merged quotes to localStorage
   localStorage.setItem('quotes', JSON.stringify(mergedQuotes));
   quotes = mergedQuotes; // Update the global quotes array
+
+  // Send the updated quotes to the server
+  await sendQuotesToServer(mergedQuotes);
 
   // Notify the user of the sync
   showNotification('Quotes have been synced with the server.');

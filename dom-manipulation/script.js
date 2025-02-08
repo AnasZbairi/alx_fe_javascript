@@ -1,4 +1,76 @@
-// Step 1: Integrate Web Storage and Filtering
+// Step 1: Simulate Server Interaction
+
+// Mock API URL for fetching quotes
+const MOCK_API_URL = 'https://jsonplaceholder.typicode.com/posts';
+
+// Function to fetch quotes from the server
+async function fetchQuotesFromServer() {
+  try {
+    const response = await fetch(MOCK_API_URL);
+    if (!response.ok) {
+      throw new Error('Failed to fetch quotes from the server');
+    }
+    const data = await response.json();
+    // Simulate server response by mapping the data to our quote structure
+    return data.map(item => ({
+      text: item.title,
+      category: 'Server Category' // Default category for server quotes
+    }));
+  } catch (error) {
+    console.error('Error fetching quotes from the server:', error);
+    return [];
+  }
+}
+
+// Step 2: Implement Data Syncing
+
+// Function to sync local quotes with server quotes
+async function syncQuotes() {
+  const serverQuotes = await fetchQuotesFromServer();
+  const localQuotes = JSON.parse(localStorage.getItem('quotes')) || [];
+
+  // Merge server quotes with local quotes (server data takes precedence)
+  const mergedQuotes = [...localQuotes];
+  serverQuotes.forEach(serverQuote => {
+    const exists = localQuotes.some(localQuote => localQuote.text === serverQuote.text);
+    if (!exists) {
+      mergedQuotes.push(serverQuote);
+    }
+  });
+
+  // Save merged quotes to localStorage
+  localStorage.setItem('quotes', JSON.stringify(mergedQuotes));
+  quotes = mergedQuotes; // Update the global quotes array
+
+  // Notify the user of the sync
+  showNotification('Quotes have been synced with the server.');
+  populateCategories(); // Update the categories dropdown
+  filterQuotes(); // Refresh the displayed quotes
+}
+
+// Step 3: Handling Conflicts
+
+// Function to show a notification to the user
+function showNotification(message) {
+  const notification = document.createElement('div');
+  notification.textContent = message;
+  notification.style.position = 'fixed';
+  notification.style.bottom = '20px';
+  notification.style.right = '20px';
+  notification.style.backgroundColor = '#4CAF50';
+  notification.style.color = 'white';
+  notification.style.padding = '10px';
+  notification.style.borderRadius = '5px';
+  notification.style.zIndex = '1000';
+  document.body.appendChild(notification);
+
+  // Remove the notification after 3 seconds
+  setTimeout(() => {
+    document.body.removeChild(notification);
+  }, 3000);
+}
+
+// Step 4: Initialize the Application
 
 // Initialize the quotes array with some default quotes or load from localStorage
 let quotes = JSON.parse(localStorage.getItem('quotes')) || [
@@ -66,8 +138,6 @@ function addQuote() {
   }
 }
 
-// Step 2: Implement Filtering Logic
-
 // Function to populate the categories dropdown
 function populateCategories() {
   const categoryFilter = document.getElementById('categoryFilter');
@@ -104,12 +174,13 @@ function filterQuotes() {
   localStorage.setItem('lastSelectedCategory', selectedCategory);
 }
 
-// Step 3: Add Event Listeners for Filtering
+// Step 5: Add Event Listeners and Initialize
 
 // Add event listener for the category filter dropdown
 document.getElementById('categoryFilter').addEventListener('change', filterQuotes);
 
-// Step 4: Initialize the Application
+// Add event listener for the sync button
+document.getElementById('syncQuotes').addEventListener('click', syncQuotes);
 
 // Display a random quote when the page loads
 showRandomQuote();
@@ -122,3 +193,6 @@ populateCategories();
 
 // Filter quotes based on the last selected category when the page loads
 filterQuotes();
+
+// Periodically sync quotes with the server (every 30 seconds)
+setInterval(syncQuotes, 30000);

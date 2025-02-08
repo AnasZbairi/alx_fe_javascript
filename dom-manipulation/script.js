@@ -68,8 +68,8 @@ async function syncQuotes() {
   // Send the updated quotes to the server
   await sendQuotesToServer(mergedQuotes);
 
-  // Notify the user of the sync
-  showNotification('Quotes have been synced with the server.');
+  // Notify the user of the sync with the exact message
+  showNotification('Quotes synced with server!');
   populateCategories(); // Update the categories dropdown
   filterQuotes(); // Refresh the displayed quotes
 }

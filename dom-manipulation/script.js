@@ -7,8 +7,8 @@ let quotes = [
   { text: "The best way to predict the future is to invent it.", category: "Innovation" }
 ];
 
-// Function to display a random quote
-function displayRandomQuote() {
+// Function to display a random quote (renamed to showRandomQuote)
+function showRandomQuote() {
   const quoteDisplay = document.getElementById('quoteDisplay');
   if (quotes.length === 0) {
     quoteDisplay.textContent = "No quotes available.";
@@ -28,14 +28,14 @@ function addQuote() {
     quotes.push({ text: newQuoteText, category: newQuoteCategory });
     document.getElementById('newQuoteText').value = '';
     document.getElementById('newQuoteCategory').value = '';
-    displayRandomQuote(); // Display the new quote immediately
+    showRandomQuote(); // Display the new quote immediately
   } else {
     alert('Please fill in both the quote and category fields.');
   }
 }
 
 // Event listener for the "Show New Quote" button
-document.getElementById('newQuote').addEventListener('click', displayRandomQuote);
+document.getElementById('newQuote').addEventListener('click', showRandomQuote);
 
 // Display a random quote when the page loads
-displayRandomQuote();
+showRandomQuote();
